@@ -1,0 +1,33 @@
+# IDE
+.idea/
+.vscode/
+
+# Environment
+.venv/
+venv/
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Build artifacts
+build/
+dist/
+allure-results/
+*.egg-info/
+test-results
+
+# Other
+.DS_Store
+*.db
+*.xlsx
+*.log
+*.csv

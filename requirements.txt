@@ -7,3 +7,4 @@ allure-pytest
 pytest-check
 pytest-playwright
 pytest-mock
+email-validator

@@ -1,0 +1,55 @@
+name: Run Tests and Generate Report
+
+on:
+  push: {} # Запуск при любом push
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install pytest pytest-check allure-pytest
+
+    - name: Install Allure Commandline
+      run: |
+        sudo apt-get update
+        sudo apt-get install default-jre -y
+        wget https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz
+        tar -zxvf allure-2.24.1.tgz -C /opt/
+        sudo ln -s /opt/allure-2.24.1/bin/allure /usr/bin/allure
+        echo "/opt/allure-2.24.1/bin" >> $GITHUB_PATH
+
+    - name: Run linter
+      run: |
+        pip install flake8
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+    - name: Run tests
+      run: |
+        python -m pytest tests/api/test_get_movies.py::TestGetMovies::test_get_movies_default -v --alluredir=allure-results
+      
+    - name: Upload Allure results
+      uses: actions/upload-artifact@v4
+      with:
+        name: allure-results
+        path: allure-results/
+        retention-days: 5
+
+    - name: Generate Allure report
+      if: always()
+      run: |
+        allure generate allure-results -o allure-report --clean
+
